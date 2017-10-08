@@ -850,7 +850,7 @@ fn bit_slice_fill_4x4_with_u32x4(a: u32, b: u32, c: u32, d: u32) -> Bs8State<u32
 }
 
 // Un bit slice into a 128 byte buffer.
-fn un_bit_slice_1x128_with_u32x4(bs: Bs8State<u32x4>, output: &mut [u8]) {
+pub fn un_bit_slice_1x128_with_u32x4(bs: Bs8State<u32x4>, output: &mut [u8]) {
     let Bs8State(t0, t1, t2, t3, t4, t5, t6, t7) = bs;
 
     let bit0 = u32x4(0x01010101, 0x01010101, 0x01010101, 0x01010101);

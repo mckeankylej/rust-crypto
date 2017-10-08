@@ -403,7 +403,7 @@ fn create_round_keys(key: &[u8], key_type: KeyType, round_keys: &mut [[u32; 4]])
 
 // This trait defines all of the operations needed for a type to be processed as part of an AES
 // encryption or decryption operation.
-trait AesOps {
+pub trait AesOps {
     fn sub_bytes(self) -> Self;
     fn inv_sub_bytes(self) -> Self;
     fn shift_rows(self) -> Self;
@@ -413,18 +413,24 @@ trait AesOps {
     fn add_round_key(self, rk: &Self) -> Self;
 }
 
-fn encrypt_core<S: AesOps + Copy>(state: &S, sk: &[S]) -> S {
-    // Round 0 - add round key
-    let mut tmp = state.add_round_key(&sk[0]);
+pub fn encrypt_round<S: AesOps + Copy>(state: S, sk: &[S]) -> S {
+    let mut tmp = state;
 
-    // Remaining rounds (except last round)
     for i in 1..sk.len() - 1 {
         tmp = tmp.sub_bytes();
         tmp = tmp.shift_rows();
         tmp = tmp.mix_columns();
         tmp = tmp.add_round_key(&sk[i]);
     }
+    tmp
+}
 
+
+fn encrypt_core<S: AesOps + Copy>(state: &S, sk: &[S]) -> S {
+    // Round 0 - add round key
+    let mut tmp = state.add_round_key(&sk[0]);
+
+    tmp = encrypt_round(tmp, sk);
     // Last round
     tmp = tmp.sub_bytes();
     tmp = tmp.shift_rows();
@@ -454,7 +460,7 @@ fn decrypt_core<S: AesOps + Copy>(state: &S, sk: &[S]) -> S {
 }
 
 #[derive(Clone, Copy)]
-struct Bs8State<T>(T, T, T, T, T, T, T, T);
+pub struct Bs8State<T>(T, T, T, T, T, T, T, T);
 
 impl <T: Copy> Bs8State<T> {
     fn split(self) -> (Bs4State<T>, Bs4State<T>) {
@@ -773,7 +779,7 @@ fn un_bit_slice_1x16_with_u16(bs: &Bs8State<u16>, output: &mut [u8]) {
 }
 
 // Bit Slice a 128 byte array of eight 16 byte blocks. Each block is in column major order.
-fn bit_slice_1x128_with_u32x4(data: &[u8]) -> Bs8State<u32x4> {
+pub fn bit_slice_1x128_with_u32x4(data: &[u8]) -> Bs8State<u32x4> {
     let bit0 = u32x4(0x01010101, 0x01010101, 0x01010101, 0x01010101);
     let bit1 = u32x4(0x02020202, 0x02020202, 0x02020202, 0x02020202);
     let bit2 = u32x4(0x04040404, 0x04040404, 0x04040404, 0x04040404);
@@ -1125,7 +1131,7 @@ impl <T: AesBitValueOps + Copy + 'static> AesOps for Bs8State<T> {
     }
 }
 
-trait AesBitValueOps: BitXor<Output = Self> + BitAnd<Output = Self> + Not<Output = Self> + Default + Sized {
+pub trait AesBitValueOps: BitXor<Output = Self> + BitAnd<Output = Self> + Not<Output = Self> + Default + Sized {
     fn shift_row(self) -> Self;
     fn inv_shift_row(self) -> Self;
     fn ror1(self) -> Self;

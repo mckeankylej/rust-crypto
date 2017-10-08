@@ -718,7 +718,7 @@ fn bit_slice_4x1_with_u16(a: u32) -> Bs8State<u16> {
 }
 
 // Bit slice a 16 byte array in column major order
-fn bit_slice_1x16_with_u16(data: &[u8]) -> Bs8State<u16> {
+pub fn bit_slice_1x16_with_u16(data: &[u8]) -> Bs8State<u16> {
     let mut n = [0u32; 4];
     read_u32v_le(&mut n, data);
 
@@ -767,7 +767,7 @@ fn un_bit_slice_4x1_with_u16(bs: &Bs8State<u16>) -> u32 {
 }
 
 // Un Bit Slice into a 16 byte array
-fn un_bit_slice_1x16_with_u16(bs: &Bs8State<u16>, output: &mut [u8]) {
+pub fn un_bit_slice_1x16_with_u16(bs: &Bs8State<u16>, output: &mut [u8]) {
     let (a, b, c, d) = un_bit_slice_4x4_with_u16(bs);
 
     write_u32_le(&mut output[0..4], a);

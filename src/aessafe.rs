@@ -141,7 +141,7 @@ macro_rules! define_aes_struct(
     ) => (
         #[derive(Clone, Copy)]
         pub struct $name {
-            sk: [Bs8State<u16>; ($rounds + 1)]
+            pub sk: [Bs8State<u16>; ($rounds + 1)]
         }
     )
 );
@@ -229,7 +229,7 @@ macro_rules! define_aes_struct_x8(
     ) => (
         #[derive(Clone, Copy)]
         pub struct $name {
-            sk: [Bs8State<u32x4>; ($rounds + 1)]
+            pub sk: [Bs8State<u32x4>; ($rounds + 1)]
         }
     )
 );

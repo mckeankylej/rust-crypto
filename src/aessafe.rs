@@ -413,16 +413,12 @@ pub trait AesOps {
     fn add_round_key(self, rk: &Self) -> Self;
 }
 
-pub fn encrypt_round<S: AesOps + Copy>(state: S, sk: &[S]) -> S {
-    let mut tmp = state;
-
-    for i in 1..sk.len() - 1 {
-        tmp = tmp.sub_bytes();
-        tmp = tmp.shift_rows();
-        tmp = tmp.mix_columns();
-        tmp = tmp.add_round_key(&sk[i]);
-    }
-    tmp
+pub fn encrypt_round<S: AesOps + Copy>(mut state: S, sk: &S) -> S {
+    state = state.sub_bytes();
+    state = state.shift_rows();
+    state = state.mix_columns();
+    state = state.add_round_key(sk);
+    state
 }
 
 
@@ -430,7 +426,9 @@ fn encrypt_core<S: AesOps + Copy>(state: &S, sk: &[S]) -> S {
     // Round 0 - add round key
     let mut tmp = state.add_round_key(&sk[0]);
 
-    tmp = encrypt_round(tmp, sk);
+    for i in 1..sk.len() - 1 {
+        tmp = encrypt_round(tmp, &sk[i]);
+    }
     // Last round
     tmp = tmp.sub_bytes();
     tmp = tmp.shift_rows();

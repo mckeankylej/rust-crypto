@@ -98,7 +98,7 @@ fn rotl64(v: u64, n: usize) -> u64 {
 }
 
 // Code based on Keccak-compact64.c from ref implementation.
-fn keccak_f(state: &mut [u8]) {
+pub fn keccak_f(state: &mut [u8]) {
     assert!(state.len() == B);
 
     let mut s: [u64; 25] = [0; 25];
